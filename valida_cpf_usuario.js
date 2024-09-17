@@ -40,4 +40,4 @@ function generateJWT(cpf) {
     // Implementar a lógica para gerar um JWT contendo o CPF
 }
 
-// Deployed by GitHub Actions
+// Deployed by GitHub Actions - Add bucket as environment variable
