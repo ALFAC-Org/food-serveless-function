@@ -1,0 +1,42 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Find all JavaScript files
+      id: find_files
+      run: |
+        files=$(find . -name '*.js')
+        echo "::set-output name=files::$files"
+
+    - name: Zip and upload each file
+      run: |
+        for file in ${{ steps.find_files.outputs.files }}; do
+          zip_name=$(basename "$file" .js).zip
+          zip -j "$zip_name" "$file"
+          aws s3 cp "$zip_name" s3://your-bucket-name/"$zip_name"
+        done
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
