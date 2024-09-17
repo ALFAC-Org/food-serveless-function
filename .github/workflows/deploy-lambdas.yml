@@ -20,22 +20,24 @@ jobs:
         node-version: '18'
 
     - name: Install dependencies
-      run: npm install
-
-    - name: Find all Lambda directories
-      id: find_dirs
       run: |
-        dirs=$(find ./lambdas -mindepth 1 -maxdepth 1 -type d)
-        echo "::set-output name=dirs::$dirs"
-
-    - name: Zip and upload each Lambda
-      run: |
-        for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-          lambda_name=$(basename "$dir")
-          zip_name="$lambda_name.zip"
+        for dir in $(find . -name 'package.json' -exec dirname {} \;); do
           cd "$dir"
-          zip -r "../$zip_name" .
-          cd ..
+          npm install
+          cd - # Volta para o diretório anterior
+        done
+
+    - name: Find all JavaScript files
+      id: find_files
+      run: |
+        files=$(find . -name '*.js')
+        echo "::set-output name=files::$files"
+
+    - name: Zip and upload each file
+      run: |
+        for file in ${{ steps.find_files.outputs.files }}; do
+          zip_name=$(basename "$file" .js).zip
+          zip -j "$zip_name" "$file"
           aws s3 cp "$zip_name" s3://${{ secrets.S3_BUCKET_NAME }}/"$zip_name"
         done
       env:
@@ -46,10 +48,10 @@ jobs:
 
     - name: Update Lambda function code
       run: |
-        for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-          lambda_name=$(basename "$dir")
-          zip_name="$lambda_name.zip"
-          aws lambda update-function-code --function-name "$lambda_name" --s3-bucket ${{ secrets.S3_BUCKET_NAME }} --s3-key "$zip_name"
+        for file in ${{ steps.find_files.outputs.files }}; do
+          zip_name=$(basename "$file" .js).zip
+          function_name=$(basename "$file" .js)
+          aws lambda update-function-code --function-name "$function_name" --s3-bucket ${{ secrets.S3_BUCKET_NAME }} --s3-key "$zip_name"
         done
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -62,9 +64,9 @@ jobs:
 
     - name: Update Lambda environment variables
       run: |
-        for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-          lambda_name=$(basename "$dir")
-          aws lambda update-function-configuration --function-name "$lambda_name" --environment "Variables={DB_HOST=${{ secrets.DB_HOST }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}}"
+        for file in ${{ steps.find_files.outputs.files }}; do
+          function_name=$(basename "$file" .js)
+          aws lambda update-function-configuration --function-name "$function_name" --environment "Variables={DB_HOST=${{ secrets.DB_HOST }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}}"
         done
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
