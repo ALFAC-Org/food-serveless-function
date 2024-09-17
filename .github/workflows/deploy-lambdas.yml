@@ -30,7 +30,7 @@ jobs:
     - name: Find all JavaScript files
       id: find_files
       run: |
-        files=$(find . -name '*.js')
+        files=$(find . -name '*.js' -not -path '*/node_modules/*')
         echo "::set-output name=files::$files"
 
     - name: Zip and upload each file
