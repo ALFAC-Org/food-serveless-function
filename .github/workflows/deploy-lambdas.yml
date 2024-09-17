@@ -36,7 +36,8 @@ jobs:
     - name: Zip and upload each file
       run: |
         for file in ${{ steps.find_files.outputs.files }}; do
-          zip_name=$(basename "$file" .js).zip
+          dir_name=$(basename $(dirname "$file"))
+          zip_name="$dir_name.zip"
           zip -j "$zip_name" "$file"
           aws s3 cp "$zip_name" s3://${{ secrets.S3_BUCKET_NAME }}/"$zip_name"
         done
@@ -49,8 +50,9 @@ jobs:
     - name: Update Lambda function code
       run: |
         for file in ${{ steps.find_files.outputs.files }}; do
-          zip_name=$(basename "$file" .js).zip
-          function_name=$(basename "$file" .js)
+          dir_name=$(basename $(dirname "$file"))
+          zip_name="$dir_name.zip"
+          function_name="$dir_name"
           aws lambda update-function-code --function-name "$function_name" --s3-bucket ${{ secrets.S3_BUCKET_NAME }} --s3-key "$zip_name"
         done
       env:
@@ -65,7 +67,8 @@ jobs:
     - name: Update Lambda environment variables
       run: |
         for file in ${{ steps.find_files.outputs.files }}; do
-          function_name=$(basename "$file" .js)
+          dir_name=$(basename $(dirname "$file"))
+          function_name="$dir_name"
           aws lambda update-function-configuration --function-name "$function_name" --environment "Variables={DB_HOST=${{ secrets.DB_HOST }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}}"
         done
       env:
