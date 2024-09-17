@@ -54,6 +54,9 @@ jobs:
         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
+    - name: Wait for Lambda update to complete
+      run: sleep 60
+
     - name: Update Lambda environment variables
       run: |
         for file in ${{ steps.find_files.outputs.files }}; do
