@@ -38,8 +38,10 @@ jobs:
         for file in ${{ steps.find_files.outputs.files }}; do
           dir_name=$(basename $(dirname "$file"))
           zip_name="$dir_name.zip"
-          zip -j "$zip_name" "$file"
+          cd "$(dirname "$file")"
+          zip -r "$zip_name" . -x "*.git*"
           aws s3 cp "$zip_name" s3://${{ secrets.S3_BUCKET_NAME }}/"$zip_name"
+          cd - # Volta para o diretório anterior
         done
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
