@@ -62,10 +62,16 @@ jobs:
     - name: Wait for Lambda update to complete
       run: sleep 60
 
+    - name: Get RDS endpoint
+      id: get_rds_endpoint
+      run: |
+        DB_HOST=$(aws rds describe-db-instances --db-instance-identifier ${{ secrets.DB_NAME }} --query "DBInstances[0].Endpoint.Address" --output text)
+        echo "DB_HOST=$DB_HOST" >> $GITHUB_ENV
+
     - name: Update Lambda environment variables
       run: |
         for file in ${{ steps.find_files.outputs.files }}; do
           dir_name=$(basename $(dirname "$file"))
           function_name="$dir_name"
-          aws lambda update-function-configuration --function-name "$function_name" --environment "Variables={DB_HOST=${{ secrets.DB_HOST }},DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}}"
+          aws lambda update-function-configuration --function-name "$function_name" --environment "Variables={DB_HOST=${{ env.DB_HOST }},DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}}"
         done
