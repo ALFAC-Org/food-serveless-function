@@ -65,7 +65,7 @@ jobs:
     - name: Get RDS endpoint
       id: get_rds_endpoint
       run: |
-        DB_HOST=$(aws rds describe-db-instances --db-instance-identifier ${{ secrets.DB_NAME }} --query "DBInstances[0].Endpoint.Address" --output text)
+        DB_HOST=$(aws rds describe-db-instances --db-instance-identifier ${{ secrets.DB_IDENTIFIER }} --query "DBInstances[0].Endpoint.Address" --output text)
         echo "DB_HOST=$DB_HOST" >> $GITHUB_ENV
 
     - name: Update Lambda environment variables
