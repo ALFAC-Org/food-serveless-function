@@ -1,61 +1,75 @@
-const mysql = require("mysql2/promise")
+const { whois } = require("./whois.js")
+const { generate, validate } = require("./jwt.js")
+const { validateCPFInRDS } = require("./database.js")
 
-exports.handler = async (event) => {
-  // Extrai o CPF dos atributos do usuário
-  // TODO: Verificar como o API Gateway envia o CPF
-  // const cpf = event.request.userAttributes['custom:cpf'];
-  const cpf = event.cpf
+module.exports.handler = async (event) => {
+  const authorization = event.headers && event.headers.Auth
+  const deny = {
+    isAuthorized: false,
+    context: {}
+  }
 
-  if (!cpf) {
-    // TODO: Retornar um token sem CPF
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "CPF is required" })
+  // SCENARIO 1: User is already authenticated
+  // So let's keep the current token
+  if (authorization) {
+    const token = authorization.split(" ")[1]
+    const decoded = validate(token)
+
+    if (decoded) {
+      return {
+        isAuthorized: true,
+        context: {
+          jwt: authorization
+        }
+      }
+    } else {
+      // TODO: refresh token?
+      return deny
     }
   }
 
-  const isValid = await validateCPFInRDS(cpf)
+  const cpf = event.headers && event.headers.Cpf
+  const who = whois(cpf) // ANONYMOUS, AUTHENTICATED, INVALID
 
-  if (isValid) {
+  // SCENARIO 2: Someone is trying to authenticate with invalid data
+  if (who === "INVALID") {
+    return deny
+  }
+
+  // SCENARIO 3: Someone is trying to authenticate as ANONYMOUS
+  if (who === "ANONYMOUS") {
+    const jwt = generate({ who })
+
     return {
-      statusCode: 200,
-      body: JSON.stringify({ token: callCognito(cpf) })
-    }
-  } else {
-    // TODO: Call cognito to insert CPF in User Pool
-    return {
-      statusCode: 404,
-      body: JSON.stringify({ message: "CPF not found" })
+      isAuthorized: true,
+      context: {
+        jwt: `Bearer ${jwt}`
+      }
     }
   }
-}
 
-async function validateCPFInRDS(cpf) {
-  let connection
-  try {
-    connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    })
-  } catch (error) {
-    console.error("Error Creating db-connection:", error)
+  // SCENARIO 4: Someone is trying to authenticate as AUTHENTICATED
+  if (who === "AUTHENTICATED") {
+    try {
+      const isValid = await validateCPFInRDS(cpf)
+
+      if (isValid) {
+        const jwt = generate({ who })
+
+        return {
+          isAuthorized: true,
+          context: {
+            jwt: `Bearer ${jwt}`
+          }
+        }
+      } else {
+        return deny
+      }
+    } catch (error) {
+      return deny
+    }
   }
 
-  try {
-    const [rows] = await connection.execute(
-      "SELECT 1 FROM users WHERE cpf = ?",
-      [cpf]
-    )
-    return rows.length > 0
-  } catch (error) {
-    console.error("Error validating CPF in RDS:", error)
-  } finally {
-    await connection.end()
-  }
-}
-
-function callCognito(cpf) {
-  // Implementar a lógica para gerar um JWT contendo o CPF
+  // ANY OTHER SCENARIO SHOULD BE CONSIDERED AS UNAUTHORIZED
+  return deny
 }
