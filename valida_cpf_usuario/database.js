@@ -13,7 +13,7 @@ module.exports.validateCPFInRDS = async (cpf) => {
   try {
     const connection = await getConnection()
     const [rows] = await connection.execute(
-      "SELECT 1 FROM users WHERE cpf = ?",
+      "SELECT 1 FROM cliente WHERE cpf = ?",
       [cpf]
     )
     await connection.end()
