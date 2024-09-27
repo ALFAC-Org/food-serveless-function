@@ -27,13 +27,6 @@ const handler = async (event) => {
     }
   }
 
-  const isValidCpf = authorization.length === 11
-
-  // SCENARIO 2: Someone is trying to authenticate with invalid data
-  if (!isValidCpf) {
-    return deny
-  }
-
   // SCENARIO 3: Someone is trying to authenticate as ANONYMOUS
   if (authorization === "ANONYMOUS") {
     const jwt = generate({ who: "ANONYMOUS" })
@@ -44,6 +37,13 @@ const handler = async (event) => {
         jwt: `Bearer ${jwt}`
       }
     }
+  }
+
+  const isValidCpf = authorization.length === 11
+
+  // SCENARIO 2: Someone is trying to authenticate with invalid data
+  if (!isValidCpf) {
+    return deny
   }
 
   // SCENARIO 4: Someone is trying to authenticate as AUTHENTICATED
