@@ -10,7 +10,7 @@ exports.handler = async (event) => {
 
   // SCENARIO 1: User is already authenticated
   // So let's keep the current token
-  if (authorization.startWith("Bearer")) {
+  if (authorization.startsWith("Bearer")) {
     const token = authorization.split(" ")[1]
     const decoded = validate(token)
 
