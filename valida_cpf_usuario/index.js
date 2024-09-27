@@ -3,7 +3,7 @@ const { generate, validate } = require("./jwt.js")
 const { validateCPFInRDS } = require("./database.js")
 
 exports.handler = async (event) => {
-  const authorization = event.headers && event.headers.Auth
+  const authorization = event.headers && event.headers.auth
   const deny = {
     isAuthorized: false,
     context: {}
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
     }
   }
 
-  const cpf = event.headers && event.headers.Cpf
+  const cpf = event.headers && event.headers.cpf
   const who = whois(cpf) // ANONYMOUS, AUTHENTICATED, INVALID
   console.log("FRAGA - WHO ln-36", who)
 
