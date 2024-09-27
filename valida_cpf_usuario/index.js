@@ -1,7 +1,7 @@
 const { generate, validate } = require("./jwt.js")
 const { validateCPFInRDS } = require("./database.js")
 
-exports.handler = async (event) => {
+const handler = async (event) => {
   const authorization = event.headers && event.headers.auth
   const deny = {
     isAuthorized: false,
@@ -35,7 +35,7 @@ exports.handler = async (event) => {
   }
 
   // SCENARIO 3: Someone is trying to authenticate as ANONYMOUS
-  if (authorization.toUpperCase() === "ANONYMOUS") {
+  if (authorization === "ANONYMOUS") {
     const jwt = generate({ who: "ANONYMOUS" })
 
     return {
@@ -47,7 +47,6 @@ exports.handler = async (event) => {
   }
 
   // SCENARIO 4: Someone is trying to authenticate as AUTHENTICATED
-
   try {
     const isValid = await validateCPFInRDS(authorization)
 
@@ -67,3 +66,5 @@ exports.handler = async (event) => {
     return deny
   }
 }
+
+exports.handler = handler;
