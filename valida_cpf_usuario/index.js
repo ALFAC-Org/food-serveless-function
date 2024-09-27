@@ -27,7 +27,7 @@ const handler = async (event) => {
     }
   }
 
-  // SCENARIO 3: Someone is trying to authenticate as ANONYMOUS
+  // SCENARIO 2: Someone is trying to authenticate as ANONYMOUS
   if (authorization.toUpperCase() === "ANONYMOUS") {
     const jwt = generate({ who: "ANONYMOUS" })
 
@@ -41,17 +41,17 @@ const handler = async (event) => {
 
   const isValidCpf = authorization.length === 11
 
-  // SCENARIO 2: Someone is trying to authenticate with invalid data
+  // SCENARIO 3: Someone is trying to authenticate with invalid data
   if (!isValidCpf) {
     return deny
   }
 
   // SCENARIO 4: Someone is trying to authenticate as AUTHENTICATED
   try {
-    const isValid = await validateCPFInRDS(authorization)
+    const getClientId = await validateCPFInRDS(authorization)
 
-    if (isValid) {
-      const jwt = generate({ who: "AUTHENTICATED", cpf: authorization })
+    if (getClientId) {
+      const jwt = generate({ who: "AUTHENTICATED", id: getClientId })
 
       return {
         isAuthorized: true,
@@ -67,4 +67,4 @@ const handler = async (event) => {
   }
 }
 
-exports.handler = handler;
+exports.handler = handler

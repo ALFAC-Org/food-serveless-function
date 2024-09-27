@@ -13,11 +13,13 @@ const validateCPFInRDS = async (cpf) => {
   try {
     const connection = await getConnection()
     const [rows] = await connection.execute(
-      "SELECT 1 FROM cliente WHERE cpf = ?",
+      "SELECT id FROM cliente WHERE cpf = ?",
       [cpf]
     )
+    
     await connection.end()
-    return rows.length > 0
+
+    return rows.length > 0 ? rows[0].id : false
   } catch (error) {
     console.error("[validateCPFInRDS] error", error)
     return false
