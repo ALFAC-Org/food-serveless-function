@@ -1,6 +1,6 @@
 const mysql = require("mysql2/promise")
 
-module.exports.getConnection = async () => {
+const getConnection = async () => {
   return await mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
@@ -9,7 +9,7 @@ module.exports.getConnection = async () => {
   })
 }
 
-module.exports.validateCPFInRDS = async (cpf) => {
+const validateCPFInRDS = async (cpf) => {
   try {
     const connection = await getConnection()
     const [rows] = await connection.execute(
@@ -23,3 +23,6 @@ module.exports.validateCPFInRDS = async (cpf) => {
     return false
   }
 }
+
+exports.getConnection = getConnection;
+exports.validateCPFInRDS = validateCPFInRDS;

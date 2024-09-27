@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const JWT_KEY = ".food-application" // chave secreta
 const JWT_TOKEN_EXPIRATION_TIME = 60 // tempo de expiração do token em minutos
 
-module.exports.generate = (payload) => {
+const generate = (payload) => {
   const jwtPayload = {
     ...payload,
     iat: Math.floor(Date.now() / 1000) - 30,
@@ -17,7 +17,7 @@ module.exports.generate = (payload) => {
   return token
 }
 
-module.exports.validate = (token) => {
+const validate = (token) => {
   try {
     const decoded = jwt.verify(token, JWT_KEY)
     return decoded
@@ -26,7 +26,5 @@ module.exports.validate = (token) => {
   }
 }
 
-// const data = generate({ who: "AUTHENTICATED", cpf: "123456789" })
-// console.log(data)
-
-// console.log(validate(data))
+exports.generate = generate
+exports.validate = validate
