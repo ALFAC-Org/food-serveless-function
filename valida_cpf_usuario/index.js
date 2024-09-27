@@ -28,7 +28,7 @@ const handler = async (event) => {
   }
 
   // SCENARIO 3: Someone is trying to authenticate as ANONYMOUS
-  if (authorization === "ANONYMOUS") {
+  if (authorization.toUpperCase() === "ANONYMOUS") {
     const jwt = generate({ who: "ANONYMOUS" })
 
     return {
