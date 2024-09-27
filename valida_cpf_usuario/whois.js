@@ -1,4 +1,4 @@
-export const whois = (cpf) => {
+module.exports.whois = (cpf) => {
   const types = {
     ANONYMOUS: "ANONYMOUS",
     AUTHENTICATED: "AUTHENTICATED",

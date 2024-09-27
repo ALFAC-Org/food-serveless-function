@@ -1,6 +1,6 @@
-import mysql from "mysql2/promise"
+const mysql = require("mysql2/promise")
 
-export const getConnection = async () => {
+module.exports.getConnection = async () => {
   return await mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
@@ -9,7 +9,7 @@ export const getConnection = async () => {
   })
 }
 
-export const validateCPFInRDS = async (cpf) => {
+module.exports.validateCPFInRDS = async (cpf) => {
   try {
     const connection = await getConnection()
     const [rows] = await connection.execute(

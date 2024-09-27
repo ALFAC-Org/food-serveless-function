@@ -1,10 +1,9 @@
-import { whois } from "./whois.mjs"
-import { generate, validate } from "./jwt.mjs"
-import { validateCPFInRDS } from "./database.mjs"
+const { whois } = require("./whois.js")
+const { generate, validate } = require("./jwt.js")
+const { validateCPFInRDS } = require("./database.js")
 
-export const handler = async (event) => {
-  // export default async (event) => {
-  const authorization = event.headers && event.headers.auth
+module.exports.handler = async (event) => {
+  const authorization = event.headers && event.headers.Auth
   const deny = {
     isAuthorized: false,
     context: {}
@@ -29,7 +28,7 @@ export const handler = async (event) => {
     }
   }
 
-  const cpf = event.headers && event.headers.cpf
+  const cpf = event.headers && event.headers.Cpf
   const who = whois(cpf) // ANONYMOUS, AUTHENTICATED, INVALID
 
   // SCENARIO 2: Someone is trying to authenticate with invalid data
@@ -74,5 +73,3 @@ export const handler = async (event) => {
   // ANY OTHER SCENARIO SHOULD BE CONSIDERED AS UNAUTHORIZED
   return deny
 }
-
-export default handler
