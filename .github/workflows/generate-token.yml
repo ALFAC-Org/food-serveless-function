@@ -31,5 +31,7 @@ jobs:
         done
 
     - name: Generate token
-      run: npm run generate:token
+      run: |
+        jwt=$(npm run generate:token | tail -n 1)
+        echo -e "Anonymous JWT token is:\n$jwt"
       working-directory: valida_cpf_usuario
