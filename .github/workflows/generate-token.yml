@@ -7,12 +7,6 @@ jobs:
   generate-token:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,7 +27,7 @@ jobs:
       - name: Generate token
         run: |
           jwt=$(npm run generate:token | tail -n 1 | sed 's/Bearer //')
-          echo -e "Anonymous JWT token is:\n$jwt"
-          echo "jwt=$jwt" >> $GITHUB_ENV
+          message="Remember to add the token to the Auth header"
+          echo -e "Anonymous JWT token is:\n$jwt\n$message"
         working-directory: valida_cpf_usuario
 
