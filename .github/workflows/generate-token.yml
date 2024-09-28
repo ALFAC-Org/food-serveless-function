@@ -14,24 +14,27 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
 
-    - name: Install dependencies
-      run: |
-        for dir in $(find . -name 'package.json' -exec dirname {} \;); do
-          cd "$dir"
-          npm install
-          cd - # Volta para o diretório anterior
-        done
+      - name: Install dependencies
+        run: |
+          for dir in $(find . -name 'package.json' -exec dirname {} \;); do
+            cd "$dir"
+            npm install
+            cd - # Volta para o diretório anterior
+          done
 
-    - name: Generate token
-      run: |
-        jwt=$(npm run generate:token | tail -n 1)
-        echo -e "Anonymous JWT token is:\n$jwt"
-      working-directory: valida_cpf_usuario
+      - name: Generate token
+        run: |
+          jwt=$(npm run generate:token | tail -n 1)
+          echo "jwt=$jwt" >> $GITHUB_ENV
+        working-directory: valida_cpf_usuario
+
+      - name: Get value
+        run: echo -e "Anonymous JWT token is:\n${{ env.jwt }}"
