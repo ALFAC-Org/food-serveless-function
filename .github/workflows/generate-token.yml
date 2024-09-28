@@ -32,9 +32,8 @@ jobs:
 
       - name: Generate token
         run: |
-          jwt=$(npm run generate:token | tail -n 1)
+          jwt=$(npm run generate:token | tail -n 1 | sed 's/Bearer //')
+          echo -e "Anonymous JWT token is:\n$jwt"
           echo "jwt=$jwt" >> $GITHUB_ENV
         working-directory: valida_cpf_usuario
 
-      - name: Get value
-        run: echo -e "Anonymous JWT token is:\n${{ env.jwt }}"
