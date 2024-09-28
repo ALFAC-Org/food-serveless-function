@@ -1,16 +1,3 @@
-// const { jest } = require("@jest/globals")
-
-// https://github.com/jestjs/jest/issues/13135#issuecomment-1221468526
-// jest.unstable_mockModule("../src/database.js", () => ({
-//   __esModule: true,
-//   getConnection: jest.fn().mockRejectedValue(true),
-//   validateCPFInRDS: jest.fn().mockRejectedValue(true)
-// }))
-
-// const { validateCPFInRDS } = await import("../src/database.js")
-
-// const { default: handler } = await import("../src/validate.js")
-
 jest.mock("../database.js", () => ({
   getConnection: jest.fn().mockRejectedValue(true),
   validateCPFInRDS: jest.fn().mockRejectedValue(true)
@@ -41,7 +28,7 @@ describe("index.js", () => {
       it("returns authorized as true", async () => {
         const result = await handler({
           headers: {
-            Auth: validAnonymousToken
+            auth: validAnonymousToken
           }
         })
 
@@ -58,7 +45,7 @@ describe("index.js", () => {
       it("returns authorized as true", async () => {
         const result = await handler({
           headers: {
-            Auth: validAuthenticatedToken
+            auth: validAuthenticatedToken
           }
         })
 
@@ -76,7 +63,7 @@ describe("index.js", () => {
     it("returns authorized as false", async () => {
       const result = await handler({
         headers: {
-          Cpf: ""
+          auth: ""
         }
       })
 
@@ -91,7 +78,7 @@ describe("index.js", () => {
     it("returns authorized as true", async () => {
       const result = await handler({
         headers: {
-          Cpf: "ANONYMOUS"
+          auth: "ANONYMOUS"
         }
       })
 
@@ -111,7 +98,7 @@ describe("index.js", () => {
 
         const result = await handler({
           headers: {
-            Cpf: "12345678911"
+            auth: "12345678911"
           }
         })
 
@@ -130,7 +117,7 @@ describe("index.js", () => {
 
         const result = await handler({
           headers: {
-            Cpf: "12345678911"
+            auth: "12345678911"
           }
         })
 

@@ -1,9 +1,13 @@
 {
-  "name": "basic-terraform-lambda-cognito-integration",
+  "name": "food-serveless-function",
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "generate:token": "node generate-token.js",
     "test": "jest --config=jest.config.js --watchAll"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [],
   "author": "",

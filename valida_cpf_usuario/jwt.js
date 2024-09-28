@@ -2,7 +2,7 @@
 // further reading: https://www.npmjs.com/package/jsonwebtoken
 const jwt = require("jsonwebtoken")
 
-const JWT_KEY = ".food-application" // chave secreta
+const JWT_KEY = process.env.JWT_KEY_TOKEN || ".food-application" // chave secreta
 const JWT_TOKEN_EXPIRATION_TIME = 60 // tempo de expiração do token em minutos
 
 const generate = (payload) => {

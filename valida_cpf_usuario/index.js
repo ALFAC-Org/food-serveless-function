@@ -2,7 +2,8 @@ const { generate, validate } = require("./jwt.js")
 const { validateCPFInRDS } = require("./database.js")
 
 const handler = async (event) => {
-  const authorization = event.headers && event.headers.auth
+  const headers = event?.headers
+  const authorization = headers?.auth
   const deny = {
     isAuthorized: false,
     context: {}
