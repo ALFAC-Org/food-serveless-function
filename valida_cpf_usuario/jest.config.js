@@ -2,7 +2,7 @@
  * For a detailed explanation regarding each configuration property, visit:
  * https://jestjs.io/docs/configuration
  */
-export default {
+module.exports = {
   rootDir: ".",
   bail: 1,
   coverageDirectory: "coverage",

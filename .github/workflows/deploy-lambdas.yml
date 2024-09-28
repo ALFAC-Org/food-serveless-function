@@ -73,5 +73,5 @@ jobs:
         for file in ${{ steps.find_files.outputs.files }}; do
           dir_name=$(basename $(dirname "$file"))
           function_name="$dir_name"
-          aws lambda update-function-configuration --function-name "$function_name" --environment "Variables={DB_HOST=${{ env.DB_HOST }},DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}}"
+          aws lambda update-function-configuration --function-name "$function_name" --environment "Variables={DB_HOST=${{ env.DB_HOST }},DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }},JWT_KEY_TOKEN=${{ secrets.JWT_KEY_TOKEN }}}"
         done
