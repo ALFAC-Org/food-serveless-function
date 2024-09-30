@@ -46,14 +46,16 @@ const handler = async (event) => {
 
     const jwt = generate({ who: "ANONYMOUS" })
 
-    log(`Generating a token for it`)
-
-    return {
+    const response = {
       isAuthorized: true,
       context: {
         jwt: `Bearer ${jwt}`
       }
     }
+
+    log(`Generating a token for it with response: ${JSON.stringify(response)}`)
+
+    return response
   }
 
   const isValidCpf = authorization.length === 11
@@ -76,21 +78,21 @@ const handler = async (event) => {
 
       const jwt = generate({ who: "AUTHENTICATED", id: getClientId })
 
-      log(`Generating a token for it`)
-
-      return {
+      const response = {
         isAuthorized: true,
         context: {
           jwt: `Bearer ${jwt}`
         }
       }
+
+      log(`Generating a token for it (using RDS): ${JSON.stringify(response)}`)
+
+      return response
     } else {
       return deny
     }
   } catch (error) {
     return deny
-  } finally {
-    log(`Finishing the request`)
   }
 }
 
