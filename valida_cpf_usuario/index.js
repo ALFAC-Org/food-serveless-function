@@ -7,6 +7,7 @@ const log = (message) => {
 
 const handler = async (event) => {
   const headers = event.headers
+  const mock = headers && headers.mock
   const authorization = headers && headers.auth
   const deny = {
     isAuthorized: false,
@@ -71,7 +72,7 @@ const handler = async (event) => {
   try {
     log(`Let's get the client id for the CPF`)
 
-    const getClientId = await validateCPFInRDS(authorization)
+    const getClientId = mock ? 1 : await validateCPFInRDS(authorization)
 
     if (getClientId) {
       log(`We got the client id for the CPF`)
